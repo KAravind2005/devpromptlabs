@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevPrompt Labs — Prompt middleware & semantic caching for AI APIs</title>
+<meta name="description" content="Low-latency prompt middleware, semantic caching, and LLM orchestration APIs for Node.js and Python backends.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<script>
+tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','system-ui','sans-serif'], mono: ['JetBrains Mono','ui-monospace','monospace'] } } } }
+</script>
+<style>
+  body { background:#020617; }
+  .grid-bg { background-image: linear-gradient(rgba(148,163,184,.06) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.06) 1px, transparent 1px); background-size: 48px 48px; mask-image: radial-gradient(ellipse at top, #000 30%, transparent 75%); -webkit-mask-image: radial-gradient(ellipse at top, #000 30%, transparent 75%); }
+  .gradient-text { background: linear-gradient(90deg,#a5b4fc,#c4b5fd,#818cf8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .tk-k{color:#c4b5fd}.tk-s{color:#86efac}.tk-f{color:#93c5fd}.tk-c{color:#64748b}.tk-n{color:#fbbf24}.tk-p{color:#f9a8d4}
+  .faq-body { display:grid; grid-template-rows:0fr; transition:grid-template-rows .3s ease; }
+  .faq-item.open .faq-body { grid-template-rows:1fr; }
+  .faq-item.open .faq-chev { transform:rotate(180deg); }
+  @keyframes pulse-dot { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .pulse-dot { animation:pulse-dot 2s infinite; }
+  @media (prefers-reduced-motion: reduce){ .pulse-dot{animation:none} .faq-body{transition:none} }
+</style>
+</head>
+<body class="font-sans text-slate-300 antialiased selection:bg-indigo-500/30">
+
+<!-- NAV -->
+<header class="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/80 backdrop-blur">
+  <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-5">
+    <a href="#" class="flex items-center gap-2.5">
+      <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg shadow-indigo-500/20">
+        <i data-lucide="terminal-square" class="h-4 w-4 text-white"></i>
+      </span>
+      <span class="font-semibold tracking-tight text-white">DevPrompt <span class="text-slate-400 font-medium">Labs</span></span>
+    </a>
+    <nav class="hidden items-center gap-8 text-sm md:flex">
+      <a href="#features" class="text-slate-400 transition hover:text-white">Features</a>
+      <a href="#architecture" class="text-slate-400 transition hover:text-white">Architecture</a>
+      <a href="#docs" class="text-slate-400 transition hover:text-white">Docs</a>
+      <a href="#pricing" class="text-slate-400 transition hover:text-white">Pricing</a>
+    </nav>
+    <div class="flex items-center gap-3">
+      <a href="#status" class="hidden items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-300 lg:flex">
+        <span class="pulse-dot h-1.5 w-1.5 rounded-full bg-emerald-400"></span>All Systems Operational
+      </a>
+      <a href="#pricing" class="rounded-lg bg-indigo-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:bg-indigo-400">Get API Key</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="relative overflow-hidden">
+  <div class="grid-bg pointer-events-none absolute inset-0"></div>
+  <div class="pointer-events-none absolute left-1/2 top-[-12rem] h-[34rem] w-[60rem] -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-600/25 via-violet-600/20 to-transparent blur-3xl"></div>
+  <div class="relative mx-auto max-w-7xl px-5 pb-20 pt-20 lg:pt-28">
+    <div class="mx-auto max-w-3xl text-center">
+      <a href="#features" class="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3.5 py-1.5 text-xs font-medium text-indigo-200 transition hover:border-indigo-400/40">
+        <span class="rounded-full bg-indigo-500 px-1.5 py-0.5 text-[10px] font-bold uppercase text-white">New</span>
+        Announcing DevPrompt v1.0 • Enterprise Edge Middleware
+        <i data-lucide="arrow-right" class="h-3 w-3"></i>
+      </a>
+      <h1 class="mt-7 text-4xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-6xl">
+        Low-latency prompt middleware and <span class="gradient-text">semantic caching</span> for AI APIs.
+      </h1>
+      <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400">
+        Drop DevPrompt between your backend and your LLM providers. Serve repeat and near-duplicate prompts from an edge cache in under 10ms, version every prompt like code, and cut token spend without touching your application logic.
+      </p>
+      <div class="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+        <a href="#pricing" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-indigo-500/25 transition hover:brightness-110 sm:w-auto">
+          Start Building Free <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+        <a href="#docs" class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-700 bg-slate-900 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-slate-500 sm:w-auto">
+          <i data-lucide="book-open" class="h-4 w-4"></i> Read Documentation
+        </a>
+      </div>
+      <p class="mt-4 font-mono text-xs text-slate-500">Free tier: 100k cached requests / month • No credit card</p>
+    </div>
+
+    <!-- SANDBOX -->
+    <div id="docs" class="mx-auto mt-16 grid max-w-6xl gap-4 lg:grid-cols-5">
+      <div class="overflow-hidden rounded-xl border border-slate-800 bg-zinc-900/80 shadow-2xl shadow-indigo-950/40 lg:col-span-3">
+        <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2.5">
+          <div class="flex items-center gap-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-slate-700"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-700"></span><span class="h-2.5 w-2.5 rounded-full bg-slate-700"></span>
+            <span class="ml-3 font-mono text-xs text-slate-500">pipeline.ts</span>
+          </div>
+          <button id="copyBtn" class="flex items-center gap-1.5 rounded-md border border-slate-700 px-2 py-1 font-mono text-[11px] text-slate-400 transition hover:text-white">
+            <i data-lucide="copy" class="h-3 w-3"></i><span id="copyLabel">Copy install</span>
+          </button>
+        </div>
+        <pre class="overflow-x-auto p-5 font-mono text-[13px] leading-6 text-slate-300"><code><span class="tk-c"># 1. Install the SDK</span>
+<span class="text-slate-500">$</span> npm i @devprompt/sdk
+
+<span class="tk-c">// 2. Wrap your provider call with semantic caching</span>
+<span class="tk-k">import</span> { <span class="tk-n">DevPrompt</span> } <span class="tk-k">from</span> <span class="tk-s">"@devprompt/sdk"</span>;
+
+<span class="tk-k">const</span> <span class="tk-n">dp</span> = <span class="tk-k">new</span> <span class="tk-f">DevPrompt</span>({
+  apiKey: process.env.<span class="tk-n">DEVPROMPT_API_KEY</span>,
+  cache: { mode: <span class="tk-s">"semantic"</span>, threshold: <span class="tk-n">0.92</span>, ttl: <span class="tk-s">"24h"</span> },
+  fallbacks: [<span class="tk-s">"claude-sonnet"</span>, <span class="tk-s">"claude-haiku"</span>],
+  budget: { maxTokensPerRequest: <span class="tk-n">4000</span> },
+});
+
+<span class="tk-k">const</span> <span class="tk-n">res</span> = <span class="tk-k">await</span> dp.<span class="tk-f">run</span>({
+  prompt: <span class="tk-s">"support/refund-policy@v3"</span>,
+  variables: { plan: <span class="tk-s">"pro"</span>, locale: <span class="tk-s">"en-US"</span> },
+});
+
+console.<span class="tk-f">log</span>(res.meta);</code></pre>
+      </div>
+
+      <div class="flex flex-col overflow-hidden rounded-xl border border-slate-800 bg-zinc-900/80 lg:col-span-2">
+        <div class="flex items-center justify-between border-b border-slate-800 bg-slate-900 px-4 py-2.5">
+          <span class="font-mono text-xs text-slate-500">response.meta</span>
+          <span class="rounded bg-emerald-500/10 px-2 py-0.5 font-mono text-[11px] font-medium text-emerald-300">200 OK</span>
+        </div>
+        <div class="grid grid-cols-2 gap-3 p-5">
+          <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-3"><div class="font-mono text-[11px] uppercase tracking-wide text-slate-500">Cache</div><div class="mt-1 flex items-center gap-1.5 text-lg font-semibold text-emerald-300"><i data-lucide="zap" class="h-4 w-4"></i>HIT</div></div>
+          <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-3"><div class="font-mono text-[11px] uppercase tracking-wide text-slate-500">Latency</div><div class="mt-1 text-lg font-semibold text-white">7.4<span class="text-sm text-slate-500">ms</span></div></div>
+          <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-3"><div class="font-mono text-[11px] uppercase tracking-wide text-slate-500">Similarity</div><div class="mt-1 text-lg font-semibold text-white">0.964</div></div>
+          <div class="rounded-lg border border-slate-800 bg-slate-950/60 p-3"><div class="font-mono text-[11px] uppercase tracking-wide text-slate-500">Tokens saved</div><div class="mt-1 text-lg font-semibold text-indigo-300">1,284</div></div>
+        </div>
+        <div class="mx-5 mb-5 flex-1 rounded-lg border border-slate-800 bg-slate-950/60 p-4 font-mono text-[12px] leading-6 text-slate-400">
+          <div><span class="tk-c">// baseline vs. DevPrompt</span></div>
+          <div class="mt-2 flex items-center justify-between"><span>Uncached (provider)</span><span class="text-slate-300">1,840ms</span></div>
+          <div class="mt-1 h-1.5 rounded bg-slate-800"><div class="h-1.5 w-full rounded bg-slate-600"></div></div>
+          <div class="mt-3 flex items-center justify-between"><span>Edge cache hit</span><span class="text-emerald-300">7.4ms</span></div>
+          <div class="mt-1 h-1.5 rounded bg-slate-800"><div class="h-1.5 w-[2%] rounded bg-gradient-to-r from-indigo-400 to-violet-400"></div></div>
+          <div class="mt-3 text-[11px] text-slate-500">prompt: support/refund-policy@v3 • region: edge-ap-south-1</div>
+        </div>
+      </div>
+    </div>
+    <p class="mx-auto mt-3 max-w-6xl text-center font-mono text-[11px] text-slate-600">Sample output shown for illustration. Actual latency varies by region, payload size, and cache state.</p>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<section class="border-y border-slate-800/80 bg-slate-950">
+  <div class="mx-auto max-w-7xl px-5 py-12">
+    <p class="text-center text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Built for modern stacks</p>
+    <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="hexagon" class="h-4 w-4 text-emerald-400"></i>Node.js</span>
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="server" class="h-4 w-4 text-slate-400"></i>Express</span>
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="triangle" class="h-4 w-4 text-white"></i>Next.js</span>
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="file-code-2" class="h-4 w-4 text-yellow-400"></i>Python</span>
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="sparkles" class="h-4 w-4 text-orange-300"></i>Anthropic Claude</span>
+      <span class="flex items-center gap-2 rounded-lg border border-slate-800 bg-zinc-900/60 px-4 py-2.5 font-mono text-sm text-slate-300"><i data-lucide="triangle" class="h-4 w-4 text-slate-200"></i>Vercel</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features" class="mx-auto max-w-7xl px-5 py-24">
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="font-mono text-xs uppercase tracking-widest text-indigo-300">Platform</p>
+    <h2 class="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">Everything between your code and the model</h2>
+    <p class="mt-4 text-slate-400">One middleware layer for caching, routing, cost control, and quality assurance — instrumented end to end.</p>
+  </div>
+  <div class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-indigo-500/20 bg-indigo-500/10"><i data-lucide="database-zap" class="h-5 w-5 text-indigo-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Semantic Cache Engine</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Embedding-based matching returns cached completions for paraphrased prompts. Tune similarity thresholds per prompt, set TTLs, and invalidate by tag or prompt version.</p>
+    </div>
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10"><i data-lucide="git-fork" class="h-5 w-5 text-violet-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Multi-Model Fallbacks &amp; Routing</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Declare ordered fallback chains and route by cost, latency, or task type. Automatic retries with jittered backoff when a provider returns 429 or 5xx.</p>
+    </div>
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-indigo-500/20 bg-indigo-500/10"><i data-lucide="shield-check" class="h-5 w-5 text-indigo-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Token Budget Guardrails</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Enforce per-request, per-user, and per-project token ceilings. Hard stops or soft alerts prevent runaway loops and surprise invoices.</p>
+    </div>
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10"><i data-lucide="globe-2" class="h-5 w-5 text-violet-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Edge Proxy Latency Optimization</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Regional edge nodes terminate TLS close to your servers, keep upstream connections warm, and reuse HTTP/2 streams to shave off connection overhead.</p>
+    </div>
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-indigo-500/20 bg-indigo-500/10"><i data-lucide="activity" class="h-5 w-5 text-indigo-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Real-time Observability &amp; Traces</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Per-request traces with latency breakdowns, token counts, cache decisions, and cost. Export spans via OpenTelemetry to the tools you already run.</p>
+    </div>
+    <div class="group rounded-xl border border-slate-800 bg-zinc-900/50 p-6 transition hover:border-indigo-500/40 hover:bg-zinc-900">
+      <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10"><i data-lucide="flask-conical" class="h-5 w-5 text-violet-300"></i></div>
+      <h3 class="mt-5 font-semibold text-white">Automated Prompt Regression Testing</h3>
+      <p class="mt-2 text-sm leading-relaxed text-slate-400">Replay golden datasets against every prompt version in CI. Score outputs with assertions or model graders and block merges that degrade quality.</p>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS / ARCHITECTURE -->
+<section id="architecture" class="border-y border-slate-800/80 bg-gradient-to-b from-slate-950 to-zinc-950">
+  <div class="mx-auto max-w-7xl px-5 py-24">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div>
+        <p class="font-mono text-xs uppercase tracking-widest text-indigo-300">Architecture</p>
+        <h2 class="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">A thin, fast layer on the hot path</h2>
+        <p class="mt-4 leading-relaxed text-slate-400">Requests hit the nearest edge node, are normalized and embedded, then checked against a vector-indexed cache. Misses are routed to your chosen provider, streamed back to the client, and written to cache asynchronously — so cache population never adds to response time.</p>
+        <ul class="mt-6 space-y-3 text-sm text-slate-300">
+          <li class="flex gap-3"><i data-lucide="check-circle-2" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400"></i>Streaming passthrough with SSE and chunked responses</li>
+          <li class="flex gap-3"><i data-lucide="check-circle-2" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400"></i>Per-tenant cache namespaces with encryption at rest</li>
+          <li class="flex gap-3"><i data-lucide="check-circle-2" class="mt-0.5 h-4 w-4 shrink-0 text-emerald-400"></i>Stateless nodes, horizontally scaled across regions</li>
+        </ul>
+      </div>
+      <div class="rounded-xl border border-slate-800 bg-zinc-900/60 p-6 font-mono text-xs">
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-300">Your Backend</span><i data-lucide="arrow-right" class="h-4 w-4 text-slate-600"></i>
+          <span class="rounded-md border border-indigo-500/40 bg-indigo-500/10 px-3 py-2 text-indigo-200">DevPrompt Edge</span><i data-lucide="arrow-right" class="h-4 w-4 text-slate-600"></i>
+          <span class="rounded-md border border-slate-700 bg-slate-900 px-3 py-2 text-slate-300">LLM Provider</span>
+        </div>
+        <div class="mt-5 space-y-2 border-t border-slate-800 pt-5 text-slate-400">
+          <div class="flex justify-between"><span>1. normalize + embed</span><span class="text-slate-500">~2ms</span></div>
+          <div class="flex justify-between"><span>2. vector lookup (cache)</span><span class="text-slate-500">~4ms</span></div>
+          <div class="flex justify-between"><span>3. hit → return cached</span><span class="text-emerald-300">&lt; 10ms total</span></div>
+          <div class="flex justify-between"><span>4. miss → route + stream</span><span class="text-slate-500">provider latency</span></div>
+          <div class="flex justify-between"><span>5. async cache write + trace</span><span class="text-slate-500">off hot path</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="status" class="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-slate-800 bg-slate-800 lg:grid-cols-4">
+      <div class="bg-slate-950 p-7 text-center"><div class="text-4xl font-extrabold text-white"><span data-count="99.99" data-dec="2">0</span>%</div><div class="mt-2 text-sm text-slate-400">Uptime</div></div>
+      <div class="bg-slate-950 p-7 text-center"><div class="text-4xl font-extrabold text-white"><span data-count="3.2" data-dec="1">0</span>x</div><div class="mt-2 text-sm text-slate-400">Latency Reduction</div></div>
+      <div class="bg-slate-950 p-7 text-center"><div class="text-4xl font-extrabold text-white"><span data-count="45" data-dec="0">0</span>%</div><div class="mt-2 text-sm text-slate-400">Token Cost Cut</div></div>
+      <div class="bg-slate-950 p-7 text-center"><div class="text-4xl font-extrabold text-white"><span data-count="10" data-dec="0">0</span>M+</div><div class="mt-2 text-sm text-slate-400">Daily Invocations</div></div>
+    </div>
+    <p class="mt-3 text-center font-mono text-[11px] text-slate-600">Figures reflect internal benchmark workloads and design targets, not a contractual SLA. Cache hit rates depend on prompt repetition in your traffic.</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" class="mx-auto max-w-7xl px-5 py-24">
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="font-mono text-xs uppercase tracking-widest text-indigo-300">Pricing</p>
+    <h2 class="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">Start free. Pay as you scale.</h2>
+  </div>
+  <div class="mx-auto mt-12 grid max-w-5xl gap-5 md:grid-cols-3">
+    <div class="rounded-xl border border-slate-800 bg-zinc-900/50 p-7">
+      <h3 class="font-semibold text-white">Developer</h3>
+      <div class="mt-3 text-4xl font-extrabold text-white">$0<span class="text-sm font-medium text-slate-500"> /mo</span></div>
+      <ul class="mt-6 space-y-2.5 text-sm text-slate-400">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>100k cached requests / month</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>Semantic cache + 2 fallbacks</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>7-day trace retention</li>
+      </ul>
+      <a href="mailto:admin@devpromptlabs.xyz?subject=API%20Key%20Request" class="mt-7 block rounded-lg border border-slate-700 py-2.5 text-center text-sm font-semibold text-slate-200 transition hover:border-slate-500">Get API Key</a>
+    </div>
+    <div class="relative rounded-xl border border-indigo-500/50 bg-gradient-to-b from-indigo-500/10 to-zinc-900/50 p-7 shadow-xl shadow-indigo-950/40">
+      <span class="absolute -top-3 left-7 rounded-full bg-indigo-500 px-3 py-0.5 text-[11px] font-bold uppercase text-white">Most popular</span>
+      <h3 class="font-semibold text-white">Team</h3>
+      <div class="mt-3 text-4xl font-extrabold text-white">$79<span class="text-sm font-medium text-slate-500"> /mo + usage</span></div>
+      <ul class="mt-6 space-y-2.5 text-sm text-slate-300">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>5M cached requests included</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>Budget guardrails + routing rules</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>CI regression testing, 30-day traces</li>
+      </ul>
+      <a href="mailto:admin@devpromptlabs.xyz?subject=Team%20Plan" class="mt-7 block rounded-lg bg-indigo-500 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-indigo-400">Start Team trial</a>
+    </div>
+    <div class="rounded-xl border border-slate-800 bg-zinc-900/50 p-7">
+      <h3 class="font-semibold text-white">Enterprise</h3>
+      <div class="mt-3 text-4xl font-extrabold text-white">Custom</div>
+      <ul class="mt-6 space-y-2.5 text-sm text-slate-400">
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>Dedicated edge regions</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>SSO, audit logs, custom retention</li>
+        <li class="flex gap-2"><i data-lucide="check" class="mt-0.5 h-4 w-4 text-indigo-300"></i>Priority support and SLA</li>
+      </ul>
+      <a href="mailto:admin@devpromptlabs.xyz?subject=Enterprise" class="mt-7 block rounded-lg border border-slate-700 py-2.5 text-center text-sm font-semibold text-slate-200 transition hover:border-slate-500">Contact us</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq" class="border-t border-slate-800/80 bg-slate-950">
+  <div class="mx-auto max-w-3xl px-5 py-24">
+    <h2 class="text-center text-3xl font-bold tracking-tight text-white">Frequently asked questions</h2>
+    <div class="mt-10 divide-y divide-slate-800 rounded-xl border border-slate-800 bg-zinc-900/40">
+      <div class="faq-item open">
+        <button class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded="true">
+          <span class="font-medium text-white">How is my prompt and response data stored and secured?</span>
+          <i data-lucide="chevron-down" class="faq-chev h-4 w-4 shrink-0 text-slate-400 transition-transform"></i>
+        </button>
+        <div class="faq-body"><div class="overflow-hidden"><p class="px-6 pb-5 text-sm leading-relaxed text-slate-400">Cached payloads are encrypted with AES-256 at rest and TLS 1.3 in transit, and isolated in per-tenant namespaces. You control retention with per-prompt TTLs, can mark prompts as never-cache, and can enable PII redaction before embedding. Provider API keys are stored encrypted and never written to traces. You can purge any namespace or tag at any time via the API.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded="false">
+          <span class="font-medium text-white">What latency should I expect, and how is it measured?</span>
+          <i data-lucide="chevron-down" class="faq-chev h-4 w-4 shrink-0 text-slate-400 transition-transform"></i>
+        </button>
+        <div class="faq-body"><div class="overflow-hidden"><p class="px-6 pb-5 text-sm leading-relaxed text-slate-400">Cache hits are designed to return in under 10ms at the edge, measured server-side from request receipt to first byte. Cache misses add a small proxy overhead on top of provider latency. Every response includes a <span class="font-mono text-slate-300">meta.latency</span> breakdown, and our benchmark harness is documented so you can reproduce results against your own traffic.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded="false">
+          <span class="font-medium text-white">Which SDKs and providers are supported?</span>
+          <i data-lucide="chevron-down" class="faq-chev h-4 w-4 shrink-0 text-slate-400 transition-transform"></i>
+        </button>
+        <div class="faq-body"><div class="overflow-hidden"><p class="px-6 pb-5 text-sm leading-relaxed text-slate-400">First-party SDKs are available for Node.js (<span class="font-mono text-slate-300">@devprompt/sdk</span>, TypeScript-first) and Python (<span class="font-mono text-slate-300">devprompt</span>, sync and async). Express and Next.js middleware adapters are included. Anthropic Claude is supported natively, and any provider with an OpenAI-compatible endpoint can be added as a route.</p></div></div>
+      </div>
+      <div class="faq-item">
+        <button class="flex w-full items-center justify-between gap-4 px-6 py-5 text-left" aria-expanded="false">
+          <span class="font-medium text-white">How does billing work?</span>
+          <i data-lucide="chevron-down" class="faq-chev h-4 w-4 shrink-0 text-slate-400 transition-transform"></i>
+        </button>
+        <div class="faq-body"><div class="overflow-hidden"><p class="px-6 pb-5 text-sm leading-relaxed text-slate-400">You pay DevPrompt only for requests processed through the middleware, based on your plan's included volume plus metered overage. Provider token charges are billed by your provider directly using your own keys, so there is no markup on model usage. Cached hits never consume provider tokens. You can cancel or change plans at any time.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="mx-auto max-w-5xl px-5 pb-24">
+  <div class="relative overflow-hidden rounded-2xl border border-indigo-500/30 bg-gradient-to-br from-indigo-600/20 via-violet-600/10 to-zinc-900 p-10 text-center">
+    <h2 class="text-2xl font-bold text-white sm:text-3xl">Ship faster AI features at a lower cost.</h2>
+    <p class="mx-auto mt-3 max-w-xl text-slate-400">Install the SDK, wrap one call, and watch your cache hit rate climb.</p>
+    <div class="mt-7 inline-flex items-center gap-3 rounded-lg border border-slate-700 bg-slate-950 px-5 py-3 font-mono text-sm text-slate-200"><span class="text-slate-500">$</span> npm i @devprompt/sdk</div>
+  </div>
+</section>
+</main>
+
+<!-- FOOTER -->
+<footer class="border-t border-slate-800 bg-slate-950">
+  <div class="mx-auto max-w-7xl px-5 py-14">
+    <div class="grid gap-10 md:grid-cols-5">
+      <div class="md:col-span-2">
+        <div class="flex items-center gap-2.5">
+          <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600"><i data-lucide="terminal-square" class="h-4 w-4 text-white"></i></span>
+          <span class="font-semibold text-white">DevPrompt Labs</span>
+        </div>
+        <p class="mt-4 max-w-xs text-sm leading-relaxed text-slate-500">Middleware, semantic caching, and orchestration APIs for production LLM applications.</p>
+        <a href="mailto:admin@devpromptlabs.xyz" class="mt-4 inline-flex items-center gap-2 text-sm text-indigo-300 hover:text-indigo-200"><i data-lucide="mail" class="h-4 w-4"></i>admin@devpromptlabs.xyz</a>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-white">Product</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
+          <li><a href="#features" class="hover:text-slate-200">Features</a></li>
+          <li><a href="#architecture" class="hover:text-slate-200">Architecture</a></li>
+          <li><a href="#pricing" class="hover:text-slate-200">Pricing</a></li>
+          <li><a href="#status" class="hover:text-slate-200">Status</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-white">Developers</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
+          <li><a href="#docs" class="hover:text-slate-200">Documentation</a></li>
+          <li><a href="#docs" class="hover:text-slate-200">Quickstart</a></li>
+          <li><a href="#faq" class="hover:text-slate-200">FAQ</a></li>
+          <li><a href="https://github.com/devprompt-labs" rel="noopener" class="hover:text-slate-200">GitHub</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-sm font-semibold text-white">Legal</h4>
+        <ul class="mt-4 space-y-2.5 text-sm text-slate-500">
+          <li><a href="mailto:admin@devpromptlabs.xyz?subject=Terms%20of%20Service" class="hover:text-slate-200">Terms of Service</a></li>
+          <li><a href="mailto:admin@devpromptlabs.xyz?subject=Developer%20Privacy%20Policy" class="hover:text-slate-200">Developer Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-12 flex flex-col items-center justify-between gap-4 border-t border-slate-800 pt-6 sm:flex-row">
+      <p class="text-xs text-slate-500">© 2026 DevPrompt Labs, Inc. All rights reserved.</p>
+      <div class="flex items-center gap-4 text-slate-500">
+        <a href="https://github.com/devprompt-labs" rel="noopener" aria-label="GitHub" class="hover:text-white"><i data-lucide="github" class="h-4 w-4"></i></a>
+        <a href="https://twitter.com/devpromptlabs" rel="noopener" aria-label="Twitter" class="hover:text-white"><i data-lucide="twitter" class="h-4 w-4"></i></a>
+        <a href="mailto:admin@devpromptlabs.xyz" aria-label="Email" class="hover:text-white"><i data-lucide="mail" class="h-4 w-4"></i></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+
+  document.querySelectorAll('.faq-item > button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const item = btn.parentElement;
+      const open = item.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open);
+    });
+  });
+
+  document.getElementById('copyBtn').addEventListener('click', async () => {
+    const label = document.getElementById('copyLabel');
+    try { await navigator.clipboard.writeText('npm i @devprompt/sdk'); label.textContent = 'Copied'; }
+    catch (e) { label.textContent = 'Press Ctrl+C'; }
+    setTimeout(() => label.textContent = 'Copy install', 1800);
+  });
+
+  const counters = document.querySelectorAll('[data-count]');
+  const run = el => {
+    const target = parseFloat(el.dataset.count), dec = parseInt(el.dataset.dec, 10), dur = 1400, t0 = performance.now();
+    const tick = now => {
+      const p = Math.min((now - t0) / dur, 1), eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = (target * eased).toFixed(dec);
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(entries => entries.forEach(e => { if (e.isIntersecting) { run(e.target); io.unobserve(e.target); } }), { threshold: 0.5 });
+    counters.forEach(c => io.observe(c));
+  } else { counters.forEach(c => c.textContent = parseFloat(c.dataset.count).toFixed(parseInt(c.dataset.dec, 10))); }
+</script>
+</body>
+</html>
